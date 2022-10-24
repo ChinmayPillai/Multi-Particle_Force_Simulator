@@ -9,6 +9,6 @@ Output: 'n' CSV Files with data columns - 'Time(in seconds), Position_X, Positio
 
 Variables to Specify in code:
 
-time_step(lower=> n\more accurate): Steps size of discretiing time (in seconds) - Force considered constant during and Output given at each time step
+time_step (lower=>more accurate): Steps size of discretiing time (in seconds) - Force considered constant during and Output given at each time step
 
 t_final: Time till which system is made to evolve
