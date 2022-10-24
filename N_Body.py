@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import csv
+from scipy import constants
 
 
 class Vector:
@@ -115,7 +116,7 @@ class Simulation_Engine(ABC):
 
 class GravitySim(Simulation_Engine):
 
-    _G = 6.6743e-11 # SI Units
+    _G = constants.gravitational_constant #6.6743e-11 # SI Units
     d_r = Vector(0,0,0)
     d_v = Vector(0,0,0)
 
@@ -136,7 +137,7 @@ class GravitySim(Simulation_Engine):
 
 class ElectroStaticSim(Simulation_Engine):
 
-    _K = 8.99e9 # SI Units
+    _K = 1 / (4 * constants.pi * constants.epsilon_0) #8.99e9 # SI Units
     d_r = Vector(0,0,0)
     d_v = Vector(0,0,0)
 
@@ -172,8 +173,8 @@ with open('N_Body.csv','r') as csv_file:
 Particles_New = Particles_Curr[:]
 Engine = GravitySim()
 
-time_step = 1000
-t_final = 86400*365
+time_step = 100
+t_final = (86400 * 365 + 100000)
 steps = int(t_final / time_step)
       
 
