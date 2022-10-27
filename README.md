@@ -1,6 +1,6 @@
 # N-Body_Force_Simulation
 
-##N_Body.py
+## N_Body.py
 
 Evolution of n bodies due to Gravity/Electrostatic Force given Mass, Charge, Position and Velocity
 
@@ -17,6 +17,6 @@ time_step (lower=>more accurate): Steps size of discretiing time (in seconds) - 
 t_final: Time till which system is made to evolve
 
 
-##Animate.py
+## Animate.py
 
 Code to animate and export video of evolution of binary system for 1 year
