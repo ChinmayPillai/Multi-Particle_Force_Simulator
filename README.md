@@ -1,4 +1,4 @@
-# N-Body_Force_Simulation
+# Multi-Body_Force_Simulation
 
 ## N_Body.py
 
