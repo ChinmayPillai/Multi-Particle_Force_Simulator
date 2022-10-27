@@ -1,4 +1,6 @@
-# N-Body_Force_Simulation
+## N-Body_Force_Simulation
+
+#N_Body.py
 Evolution of n bodies due to Gravity/Electrostatic Force given Mass, Charge, Position and Velocity
 
 
@@ -12,3 +14,7 @@ Variables to Specify in code:
 time_step (lower=>more accurate): Steps size of discretiing time (in seconds) - Force considered constant during and Output given at each time step
 
 t_final: Time till which system is made to evolve
+
+
+#Animate.py
+Code to animate and export video of evolution of binary system for 1 year
