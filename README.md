@@ -19,7 +19,7 @@ t_final: Time till which system is made to evolve
 
 ## Animate.py
 
-Code to animate and export video of evolution of system. Videos of Solar System Simulation can be found in the folder 'Simulations Videos and Photos'
+Code to animate and export video of evolution of system. Videos of Solar System Simulation can be found in the folder 'Simulations Videos & Photos'
 
 
 ## TimePeriods.py
