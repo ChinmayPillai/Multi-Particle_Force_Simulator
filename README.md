@@ -23,4 +23,4 @@ Code to animate and export video of evolution of system. Videos of Solar System 
 
 
 ## TimePeriods.py
-Find the time period of revolution of each body
+Code to find the time period of revolution of every body
