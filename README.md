@@ -19,7 +19,7 @@ t_final: Time till which system is made to evolve
 
 ## Animate.py
 
-Code to animate and export video of evolution of binary system for 1 year
+Code to animate and export video of evolution of system
 
 
 ## TimePeriods.py
