@@ -4,7 +4,7 @@ import numpy as np
 
 n = 9
 
-print("Time Period of Body:\n")
+print("Time Period of Revolution of Body:\n")
 
 for j in range(0,n,1):
     file_name = 'Output\Evolution_' + str(j) +'.csv'
