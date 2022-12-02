@@ -4,7 +4,7 @@ import numpy as np
 
 n = 9
 
-print("Eccentricity of Orbit:\n")
+print("Eccentricity of Orbit of Body:\n")
 
 for j in range(0,n,1):
     file_name = 'Output\Evolution_' + str(j) +'.csv'
