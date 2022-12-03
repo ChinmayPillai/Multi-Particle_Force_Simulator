@@ -25,13 +25,6 @@ for i in range(n):
                 y.append(float(line[2]))
                 if(i == 0): 
                     steps += 1
-            
-"""with open('Output\Evolution_3.csv','r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        
-        for line in csv_reader:
-            x_1.append(float(line[1]))
-            y_1.append(float(line[2]))"""
 
 
 xdata = []
