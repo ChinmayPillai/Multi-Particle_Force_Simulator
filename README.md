@@ -16,7 +16,7 @@ time_step (lower=>more accurate): Steps size of discretiing time (in seconds) - 
 
 t_final: Time till which system is made to evolve
 
-Engine: Specify whether to simulate Gravity or Electrostatic force taking the other to be negligible
+Engine: Specify whether to simulate Gravity or Electrostatic force taking the other to be negligible [either GravitySim() or ElectroStaticSim()]
 
 
 ## Animate.py
