@@ -10,7 +10,7 @@ Input: CSV File named "N_Body" with data columns - 'Mass, Charge, Position_X, Po
 Output: 'n' CSV Files with data columns - 'Time(in seconds), Position_X, Position_Y and Position_Z'
 
 
-Variables to Specify in code:
+Run Code after specifying following variables within code:
 
 time_step (lower=>more accurate): Steps size of discretiing time (in seconds) - Force considered constant during and Output given at each time step
 
