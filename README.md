@@ -2,7 +2,7 @@
 
 ## N_Body.py
 
-Evolution of n bodies due to Gravity/Electrostatic Force given Mass, Charge, Position and Velocity
+Simulation of Multi-Body Evolution due to Gravity/Electrostatic Force given Mass, Charge, Position and Velocity
 
 
 Input: CSV File named "N_Body" with data columns - 'Mass, Charge, Position_X, Position_Y, Position_Z, Velocity_X, Velocity_Y and Velocity_Z' (no header)
