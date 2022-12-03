@@ -12,9 +12,9 @@ Output: 'n' CSV Files with data columns - 'Time(in seconds), Position_X, Positio
 
 Run Code after specifying the following variables within the code:
 
-time_step (lower=>more accurate): Steps size of discretising time (in seconds) - Force considered constant during and Output given at each time step
+time_step (in seconds)(lower=>more accurate): Steps size of discretising time - Force considered constant during and Output given at each time step
 
-t_final: Time till which system is made to evolve
+t_final (in seconds): Time till which system is made to evolve
 
 Engine: Specify whether to simulate Gravity or Electrostatic force, taking the other to be negligible [either GravitySim() or ElectroStaticSim()]
 
@@ -25,7 +25,7 @@ Code to animate and export video of the evolution of the system. Videos of Solar
 
 
 ## TimePeriods.py
-Code to find the time period of revolution of every body
+Code to find the time period of revolution of every particle
 
 ## Eccentricity.py
-Code to find the eccentricity of revolution of every body
+Code to find the eccentricity of orbit of every particle
