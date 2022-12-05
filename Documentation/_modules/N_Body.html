@@ -1,0 +1,531 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>N_Body &mdash; Multi-Body Gravity/Electrostatic Force Simulator 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Multi-Body Gravity/Electrostatic Force Simulator
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Multi-Body Force Simulator</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Multi-Body Gravity/Electrostatic Force Simulator</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>N_Body</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for N_Body</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Simulation of Multi-Body Evolution due to Gravity/Electrostatic Force given Mass, Charge, Position, and Velocity</span>
+
+<span class="sd">Specify:</span>
+<span class="sd">    | **time_step** = Steps size of discretising time: Force considered constant during this period and Output given at each time step</span>
+<span class="sd">    | **t_final** = Time till which system is made to evolve</span>
+<span class="sd">    | **Engine** = Specify whether to simulate Gravity or Electrostatic force, taking the other to be negligible [either GravitySim() or ElectroStaticSim()]</span>
+<span class="sd">    | **filepath** = Location of code</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">constants</span>
+
+
+<div class="viewcode-block" id="Vector"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector">[docs]</a><span class="k">class</span> <span class="nc">Vector</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Vector Class</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialisation funtion for &#39;x&#39;, &#39;y&#39; and &#39;z&#39; components of vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">z</span>
+    
+    <span class="c1">#Accessor Functions</span>
+<div class="viewcode-block" id="Vector.X"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector.X">[docs]</a>    <span class="k">def</span> <span class="nf">X</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Accessor Function for &#39;x&#39; component of vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span></div>
+
+<div class="viewcode-block" id="Vector.Y"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector.Y">[docs]</a>    <span class="k">def</span> <span class="nf">Y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Accessor Function for &#39;y&#39; component of vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span></div>
+
+<div class="viewcode-block" id="Vector.Z"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector.Z">[docs]</a>    <span class="k">def</span> <span class="nf">Z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Accessor Function for &#39;z&#39; component of vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span></div>
+
+    <span class="c1">#Manipulator Functions</span>
+<div class="viewcode-block" id="Vector.NewX"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector.NewX">[docs]</a>    <span class="k">def</span> <span class="nf">NewX</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_x</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Manipulator Function for &#39;x&#39; component of vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">new_x</span></div>
+    
+<div class="viewcode-block" id="Vector.NewY"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector.NewY">[docs]</a>    <span class="k">def</span> <span class="nf">NewY</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_y</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Manipulator Function for &#39;y&#39; component of vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">new_y</span></div>
+    
+<div class="viewcode-block" id="Vector.NewZ"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector.NewZ">[docs]</a>    <span class="k">def</span> <span class="nf">NewZ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_z</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Manipulator Function for &#39;z&#39; component of vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">new_z</span></div>
+    
+    <span class="c1">#Operator Overloading</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Operator Overloading for Vector Addition</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+
+    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Operator Overloading for Vector Addition (+=)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">other</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Operator Overloading for Vector Subtraction</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+    
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Operator Overloading for Scalar Multiplication of Vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">*</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+    
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Operator Overloading for Scalar Division of Vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">other</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+    
+    <span class="c1">#Dot Product</span>
+    <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Operator Overloading for Vector Dot Product</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+
+    <span class="c1">#Print</span>
+<div class="viewcode-block" id="Vector.Print"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector.Print">[docs]</a>    <span class="k">def</span> <span class="nf">Print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Function to Print Vector</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span><span class="s2">&quot;)&quot;</span><span class="p">)</span></div></div>
+    
+
+<div class="viewcode-block" id="Particle"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle">[docs]</a><span class="k">class</span> <span class="nc">Particle</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Particle Class with attributes </span>
+<span class="sd">    Mass, Charge, Position(Vector) &amp; Velocity(Vector)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialisation funtion for &#39;Mass&#39;, &#39;Charge&#39;, &#39;Position&#39; and &#39;Velocity&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="n">m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_q</span> <span class="o">=</span> <span class="n">q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">v</span>
+    
+    <span class="c1">#Accessor Functions</span>
+<div class="viewcode-block" id="Particle.M"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.M">[docs]</a>    <span class="k">def</span> <span class="nf">M</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Accessor Function for Mass of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span></div>
+    
+<div class="viewcode-block" id="Particle.Q"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.Q">[docs]</a>    <span class="k">def</span> <span class="nf">Q</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Accessor Function for Charge of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q</span></div>
+
+<div class="viewcode-block" id="Particle.R"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.R">[docs]</a>    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Accessor Function for Position Vector of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span></div>
+
+<div class="viewcode-block" id="Particle.V"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.V">[docs]</a>    <span class="k">def</span> <span class="nf">V</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Accessor Function for Velocity Vector of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span></div>
+    
+    <span class="c1">#Manipulator Functions</span>
+<div class="viewcode-block" id="Particle.NewM"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.NewM">[docs]</a>    <span class="k">def</span> <span class="nf">NewM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_m</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Manipulator Function for Mass of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="n">new_m</span></div>
+    
+<div class="viewcode-block" id="Particle.NewQ"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.NewQ">[docs]</a>    <span class="k">def</span> <span class="nf">NewQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_q</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Manipulator Function for Charge of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_q</span> <span class="o">=</span> <span class="n">new_q</span></div>
+    
+<div class="viewcode-block" id="Particle.NewR"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.NewR">[docs]</a>    <span class="k">def</span> <span class="nf">NewR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_r</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Manipulator Function for Position Vector of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">new_r</span></div>
+    
+<div class="viewcode-block" id="Particle.NewV"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.NewV">[docs]</a>    <span class="k">def</span> <span class="nf">NewV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_v</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Manipulator Function for Velocity Vector of Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">new_v</span></div>
+
+    <span class="c1">#Print</span>
+<div class="viewcode-block" id="Particle.Print"><a class="viewcode-back" href="../N_Body.html#N_Body.Particle.Print">[docs]</a>    <span class="k">def</span> <span class="nf">Print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Funtion to print all attributes of the Particle</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">,</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="p">,</span><span class="s2">&quot; (&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span><span class="s2">&quot;) (&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span><span class="s2">&quot;)&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Simulation_Engine"><a class="viewcode-back" href="../N_Body.html#N_Body.Simulation_Engine">[docs]</a><span class="k">class</span> <span class="nc">Simulation_Engine</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Simulation Engine Class with Force Vector and Virtual Functions</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialise Force Vector and set it to &#39;0&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Force</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Simulation_Engine.run"><a class="viewcode-back" href="../N_Body.html#N_Body.Simulation_Engine.run">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Virtual Function for run()</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+    
+<div class="viewcode-block" id="Simulation_Engine.force"><a class="viewcode-back" href="../N_Body.html#N_Body.Simulation_Engine.force">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Virtual Function for force()</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div></div>
+    
+
+<div class="viewcode-block" id="GravitySim"><a class="viewcode-back" href="../N_Body.html#N_Body.GravitySim">[docs]</a><span class="k">class</span> <span class="nc">GravitySim</span><span class="p">(</span><span class="n">Simulation_Engine</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Gravity Simulator Engine inherited from Simulation_Engine</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_G</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">gravitational_constant</span> <span class="c1">#6.6743e-11 # SI Units</span>
+    <span class="n">d_r</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">d_v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GravitySim.force"><a class="viewcode-back" href="../N_Body.html#N_Body.GravitySim.force">[docs]</a>    <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Takes two particles as arguments and calculates the force between them</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Force</span> <span class="o">+=</span> <span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">-</span><span class="n">p1</span><span class="o">.</span><span class="n">R</span><span class="p">())</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_G</span><span class="o">*</span><span class="n">p1</span><span class="o">.</span><span class="n">M</span><span class="p">()</span><span class="o">*</span><span class="n">p2</span><span class="o">.</span><span class="n">M</span><span class="p">())</span><span class="o">/</span><span class="p">(((</span><span class="n">p1</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">-</span><span class="n">p2</span><span class="o">.</span><span class="n">R</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">-</span><span class="n">p2</span><span class="o">.</span><span class="n">R</span><span class="p">()))</span><span class="o">**</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GravitySim.run"><a class="viewcode-back" href="../N_Body.html#N_Body.GravitySim.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">time_step</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Takes a particle and time_step as arguments </span>
+<span class="sd">        and updates the position and velocity of the particle due to </span>
+<span class="sd">        the Net force acting on it</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">p_f</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">d_r</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">V</span><span class="p">()</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Force</span> <span class="o">*</span> <span class="p">(</span><span class="n">time_step</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">.</span><span class="n">M</span><span class="p">())</span>
+        <span class="n">d_v</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Force</span> <span class="o">*</span> <span class="n">time_step</span><span class="p">)</span><span class="o">/</span><span class="n">p</span><span class="o">.</span><span class="n">M</span><span class="p">()</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewM</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">M</span><span class="p">())</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewQ</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">Q</span><span class="p">())</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewR</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">R</span><span class="p">()</span> <span class="o">+</span> <span class="n">d_r</span><span class="p">)</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewV</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">V</span><span class="p">()</span> <span class="o">+</span> <span class="n">d_v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p_f</span></div></div>
+
+
+<div class="viewcode-block" id="ElectroStaticSim"><a class="viewcode-back" href="../N_Body.html#N_Body.ElectroStaticSim">[docs]</a><span class="k">class</span> <span class="nc">ElectroStaticSim</span><span class="p">(</span><span class="n">Simulation_Engine</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    ElectroStatic Force Simulator Engine inherited from Simulation_Engine</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_K</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">epsilon_0</span><span class="p">)</span> <span class="c1">#8.99e9 # SI Units</span>
+    <span class="n">d_r</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">d_v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElectroStaticSim.force"><a class="viewcode-back" href="../N_Body.html#N_Body.ElectroStaticSim.force">[docs]</a>    <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Takes two particles as arguments and calculates the force between them</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Force</span> <span class="o">+=</span> <span class="p">(</span><span class="n">p2</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">-</span><span class="n">p1</span><span class="o">.</span><span class="n">R</span><span class="p">())</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_K</span><span class="o">*</span><span class="n">p1</span><span class="o">.</span><span class="n">Q</span><span class="p">()</span><span class="o">*</span><span class="n">p2</span><span class="o">.</span><span class="n">Q</span><span class="p">())</span><span class="o">/</span><span class="p">(((</span><span class="n">p1</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">-</span><span class="n">p2</span><span class="o">.</span><span class="n">R</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">-</span><span class="n">p2</span><span class="o">.</span><span class="n">R</span><span class="p">()))</span><span class="o">**</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ElectroStaticSim.run"><a class="viewcode-back" href="../N_Body.html#N_Body.ElectroStaticSim.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">time_step</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Takes a particle and time_step as arguments </span>
+<span class="sd">        and updates the position and velocity of the particle due to </span>
+<span class="sd">        the Net force acting on it</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">p_f</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">d_r</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">V</span><span class="p">()</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Force</span> <span class="o">*</span> <span class="p">(</span><span class="n">time_step</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">.</span><span class="n">M</span><span class="p">())</span>
+        <span class="n">d_v</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Force</span> <span class="o">*</span> <span class="n">time_step</span><span class="p">)</span><span class="o">/</span><span class="n">p</span><span class="o">.</span><span class="n">M</span><span class="p">()</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewM</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">M</span><span class="p">())</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewQ</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">Q</span><span class="p">())</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewR</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">R</span><span class="p">()</span> <span class="o">+</span> <span class="n">d_r</span><span class="p">)</span>
+        <span class="n">p_f</span><span class="o">.</span><span class="n">NewV</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">V</span><span class="p">()</span> <span class="o">+</span> <span class="n">d_v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p_f</span></div></div>
+    
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">Particles_Curr</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">filepath</span> <span class="o">=</span> <span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">Users</span><span class="se">\\</span><span class="s2">chinm</span><span class="se">\\</span><span class="s2">Documents</span><span class="se">\\</span><span class="s2">Code\Quazar</span><span class="se">\\</span><span class="s2">Multi-Body Force Simulator</span><span class="se">\\</span><span class="s2">&quot;</span>
+
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;N_Body.csv&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csv_file</span><span class="p">:</span>
+    <span class="n">csv_reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">csv_reader</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">7</span><span class="p">]))</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="n">r</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">Particles_Curr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+
+<span class="n">Particles_New</span> <span class="o">=</span> <span class="n">Particles_Curr</span><span class="p">[:]</span>
+<span class="n">Engine</span> <span class="o">=</span> <span class="n">GravitySim</span><span class="p">()</span>
+
+<span class="n">time_step</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">t_final</span> <span class="o">=</span> <span class="p">(</span><span class="mi">86400</span> <span class="o">*</span> <span class="mi">365</span><span class="p">)</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">t_final</span> <span class="o">/</span> <span class="n">time_step</span><span class="p">)</span>
+      
+
+<span class="c1">#Print Particles t=0 Position</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;Output</span><span class="se">\\</span><span class="s1">Evolution_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;.csv&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">new_csv</span><span class="p">:</span>
+        <span class="n">csv_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">new_csv</span><span class="p">)</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">X</span><span class="p">(),</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Y</span><span class="p">(),</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Z</span><span class="p">()]</span>
+        <span class="n">csv_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+
+<span class="c1">#Calculate at every discrete time interval</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">steps</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="c1">#Calculate for every Particle</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+
+        <span class="c1">#Calculate Force on the Particle</span>
+        <span class="n">Engine</span><span class="o">.</span><span class="n">Force</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">):</span>
+                <span class="n">Engine</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="c1">#Find Paricles New Position and Velocity</span>
+        <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Engine</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">time_step</span><span class="p">)</span>
+
+        <span class="c1">#Print Particle&#39;s New Position</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;Output</span><span class="se">\\</span><span class="s1">Evolution_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;.csv&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">add_csv</span><span class="p">:</span>
+            <span class="n">csv_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">add_csv</span><span class="p">)</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">+</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">X</span><span class="p">(),</span> <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Y</span><span class="p">(),</span> <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Z</span><span class="p">()]</span>
+            <span class="n">csv_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="c1">#Update Particle</span>
+    <span class="n">Particles_Curr</span> <span class="o">=</span> <span class="n">Particles_New</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Chinmay Pillai
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
