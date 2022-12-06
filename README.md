@@ -5,18 +5,20 @@
 Simulation of Multi-Body Evolution due to Gravity/Electrostatic Force given Mass, Charge, Position, and Velocity
 
 
-Input: CSV File named "N_Body" with data columns - 'Mass, Charge, Position_X, Position_Y, Position_Z, Velocity_X, Velocity_Y and Velocity_Z' (no header)
+- Input: CSV File named "N_Body" with data columns - 'Mass, Charge, Position_X, Position_Y, Position_Z, Velocity_X, Velocity_Y and Velocity_Z' (no header)
 
-Output: 'n' CSV Files with data columns - 'Time(in seconds), Position_X, Position_Y and Position_Z'
+- Output: 'n' CSV Files with data columns - 'Time(in seconds), Position_X, Position_Y and Position_Z'
 
 
-Run Code after specifying the following variables within the code:
+**Arguments:**
+-	time_step (int): Steps size of discretising time (lower⇒more accurate): Force considered constant during this period and Output given at each time step. 
+-	t_final (int): Time till which system is made to evolve
+-	Engine (GravitySim or ElectroStaticSim): Specify whether to simulate Gravity or Electrostatic force, taking the other to be negligible [either GravitySim() or ElectroStaticSim()]
+-	filepath (string): Path of input CSV
 
-- time_step (in seconds)(lower=>more accurate): Steps size of discretising time - Force considered constant during and Output given at each time step
+**Example execution from command-line:**
+- python ./N_Body.py --time_step 10000 --t_final 5000000 --engine GravitySim --input .
 
-- t_final (in seconds): Time till which system is made to evolve
-
-- Engine: Specify whether to simulate Gravity or Electrostatic force, taking the other to be negligible [either GravitySim() or ElectroStaticSim()]
 
 
 ## Description
@@ -40,11 +42,40 @@ We run three nested ‘for’ loops. The innermost loop is to calculate the forc
 Code to animate and export video of the evolution of the system. Videos of Solar System Simulation can be found in the folder 'Simulations Videos & Photos'
 
 
+**Arguments:**
+-	n (int): Number of Particles
+-	filepath (string): Path of folder containing input CSVs
+-	output (string): Path of folder for output Video
+-	in_step (int): Adjust resolution of animation. Skip (in_step-1) many lines from CSV between each input line. 0 is for no skips and higher in_step gives faster computation
+-	interval (int): Interval in msec between each frame for animation
+-	frames (int): Number of frames in output video
+
+
+**Example execution from command-line:**
+- python ./Animate.py --n 9 --input ./Output --output . --in_step 10 --interval 100 --frames 50
+
+
+
 ## TimePeriods.py
 Code to find the time period of revolution of every particle
 
+**Arguments:**
+-	n (int): Number of Particles
+-	filepath (string): Path of folder containing input CSV
+
+**Example execution from command-line:**
+- python ./TimePeriods.py --n 9 --input ./Output
+
+
 ## Eccentricity.py
 Code to find the eccentricity of orbit of every particle
+
+**Arguments:**
+-	n (int): Number of Particles
+-	filepath (string): Path of folder containing input CSV
+
+**Example execution from command-line:**
+- python ./Eccentricity.py --n 9 --input ./Output
 
 ## Execution Time
 Code that takes both a function and its arguments as its own arguments and returns the result
