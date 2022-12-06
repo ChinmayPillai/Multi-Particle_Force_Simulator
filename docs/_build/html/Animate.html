@@ -169,14 +169,17 @@
 <p>Animate the Particle Trajectory from CSV File</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="Animate.AnimOrbits">
-<span class="sig-prename descclassname"><span class="pre">Animate.</span></span><span class="sig-name descname"><span class="pre">AnimOrbits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Animate.html#AnimOrbits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Animate.AnimOrbits" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Animate.</span></span><span class="sig-name descname"><span class="pre">AnimOrbits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Animate.html#AnimOrbits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Animate.AnimOrbits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Code to animate and export video of the evolution of the system</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<em>int</em>) – Number of Particles</p></li>
-<li><p><strong>show_plot</strong> (<em>bool</em>) – Whether to show final plot after animating or not</p></li>
-<li><p><strong>filepath</strong> (<em>string</em>) – Path of code location</p></li>
+<li><p><strong>filepath</strong> (<em>string</em>) – Path of folder containing input CSVs</p></li>
+<li><p><strong>output</strong> (<em>string</em>) – Path of folder for output Video</p></li>
+<li><p><strong>in_step</strong> (<em>int</em>) – Adjust resolution of animation. Skip in_step-1 many lines from CSV between each input line. 0 is for no skips and higher in_step gives faster computation</p></li>
+<li><p><strong>interval</strong> (<em>int</em>) – Interval in msec between each frame for animation</p></li>
+<li><p><strong>frames</strong> (<em>int</em>) – Number of frames in output video</p></li>
 </ul>
 </dd>
 </dl>

@@ -158,6 +158,7 @@
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
 
 
 <div class="viewcode-block" id="Vector"><a class="viewcode-back" href="../N_Body.html#N_Body.Vector">[docs]</a><span class="k">class</span> <span class="nc">Vector</span><span class="p">:</span>
@@ -541,7 +542,7 @@
 <span class="sd">        time_step (int): Steps size of discretising time: Force considered constant during this period and Output given at each time step</span>
 <span class="sd">        t_final (int): Time till which system is made to evolve</span>
 <span class="sd">        Engine (GravitySim or ElectroStaticSim): Specify whether to simulate Gravity or Electrostatic force, taking the other to be negligible [either GravitySim() or ElectroStaticSim()]</span>
-<span class="sd">        filepath (string): Path of code location</span>
+<span class="sd">        filepath (string): Path of input CSV</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 
@@ -549,7 +550,7 @@
     <span class="n">Particles_Curr</span> <span class="o">=</span> <span class="p">[]</span>
 
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;N_Body.csv&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csv_file</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;/N_Body.csv&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csv_file</span><span class="p">:</span>
         <span class="n">csv_reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">csv_reader</span><span class="p">:</span>
@@ -566,7 +567,7 @@
 
     <span class="c1">#Print Particles t=0 Position</span>
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;Output</span><span class="se">\\</span><span class="s1">Evolution_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;.csv&#39;</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;/Output/Evolution_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;.csv&#39;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">new_csv</span><span class="p">:</span>
             <span class="n">csv_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">new_csv</span><span class="p">)</span>
             <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">X</span><span class="p">(),</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Y</span><span class="p">(),</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Z</span><span class="p">()]</span>
@@ -589,7 +590,7 @@
             <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Engine</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">Particles_Curr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">time_step</span><span class="p">)</span>
 
             <span class="c1">#Print Particle&#39;s New Position</span>
-            <span class="n">file_name</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;Output</span><span class="se">\\</span><span class="s1">Evolution_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;.csv&#39;</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">filepath</span> <span class="o">+</span> <span class="s1">&#39;/Output/Evolution_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;.csv&#39;</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">add_csv</span><span class="p">:</span>
                 <span class="n">csv_writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">add_csv</span><span class="p">)</span>
                 <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">+</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">X</span><span class="p">(),</span> <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Y</span><span class="p">(),</span> <span class="n">Particles_New</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">R</span><span class="p">()</span><span class="o">.</span><span class="n">Z</span><span class="p">()]</span>
@@ -597,6 +598,24 @@
 
         <span class="c1">#Update Particle</span>
         <span class="n">Particles_Curr</span> <span class="o">=</span> <span class="n">Particles_New</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--time_step&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Steps size of discretising time: Force considered constant during this period and Output given at each time step&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--t_final&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Time till which system is made to evolve&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--engine&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GravitySim&#39;</span><span class="p">,</span> <span class="s1">&#39;ElectroStaticSim&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify whether to simulate Gravity or Electrostatic force, taking the other to be negligible&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--input&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path of input CSV&quot;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;GravitySim&#39;</span><span class="p">):</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">GravitySim</span><span class="p">()</span>
+    <span class="k">elif</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;ElectroStaticSim&#39;</span><span class="p">):</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">ElectroStaticSim</span><span class="p">()</span>
+
+    <span class="n">Simulator</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">t_final</span><span class="p">,</span> <span class="n">engine</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
 </pre></div>
 
            </div>
