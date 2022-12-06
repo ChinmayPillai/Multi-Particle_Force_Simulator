@@ -45,3 +45,7 @@ Code to find the time period of revolution of every particle
 
 ## Eccentricity.py
 Code to find the eccentricity of orbit of every particle
+
+## Execution Time
+Code that takes both a function and its arguments as its own arguments and returns the result
+of the function along with the time required to execute that function in seconds.
